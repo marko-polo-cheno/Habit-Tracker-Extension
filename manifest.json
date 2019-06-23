@@ -1,0 +1,19 @@
+{
+  "name": "Habit Tracker",
+  "version": "1.1",
+  "description": "simple habit tracking in your browser",
+  "permissions": [
+    "storage",
+    "unlimitedStorage"
+  ],
+  "browser_action": {
+    "default_popup": "structure.html",
+    "default_icon": {
+      "128": "linter.png"
+    }
+  },
+  "icons": {
+    "128": "linter.png"
+  },
+  "manifest_version": 2
+}

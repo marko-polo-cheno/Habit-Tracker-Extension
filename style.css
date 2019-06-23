@@ -1,0 +1,33 @@
+* {
+    font-family: avenir, arial;
+    transition: 0.5s;
+}
+
+html {
+    width: 600px;
+    height: 800px;
+}
+
+body {
+    background: #d6fcb5;
+}
+
+button,
+input,
+textarea {
+    padding: 10px;
+    margin: 10px;
+    border: 1px solid #eee;
+    background: #eee;
+    border-radius: 10px;
+}
+
+button:hover,
+input:hover {
+    background: lightskyblue;
+}
+
+#title {
+    font-weight: bold;
+    color: #368268;
+}
