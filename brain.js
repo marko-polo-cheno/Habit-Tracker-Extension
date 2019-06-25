@@ -42,14 +42,6 @@ chrome.storage.local.get('toDoList', function getData(data) {
   }
 });
 
-chrome.storage.local.set(
-  {
-    'currentDate': getDate(),
-    'toDoList' : toDoList
-  }
-);
-
-
 function getDate() {
   let today = new Date();
   let dd = String(today.getDate()).padStart(2, '0');
