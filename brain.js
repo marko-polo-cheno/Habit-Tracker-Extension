@@ -10,10 +10,11 @@ let toDoList = [
 let green = 'rgb(50, 205, 50)';
 let white = "#eee";
 
+//Shows the date to user
 chrome.storage.local.get('currentDate', function getData(data) {
   let currentDate = data.currentDate;
-  let settingButton = document.getElementById('settingButton');
-  settingButton.innerHTML = currentDate;
+  let dateLabel = document.getElementById('dateLabel');
+  dateLabel.innerHTML = currentDate;
 });
 
 chrome.storage.local.get('toDoList', function getData(data) {
@@ -41,6 +42,15 @@ chrome.storage.local.get('toDoList', function getData(data) {
     addButtonsHere.appendChild(button);
   }
 });
+
+setTimeout(
+  nightTask,
+  moment("3:00:00", "hh:mm:ss").diff(moment(), 'seconds')
+);
+
+function nightTask() {
+  
+}
 
 function getDate() {
   let today = new Date();
