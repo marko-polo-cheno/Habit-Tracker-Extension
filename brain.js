@@ -15,6 +15,7 @@ fillStorage();
 // Set date
 document.getElementById('dateLabel').innerHTML = getDate();
 
+
 chrome.storage.local.get('toDoList', function getData(data) {
   toDoList = (data.toDoList) ? data.toDoList : toDoList;
   for (let x = 0; x < 7; x++) {
@@ -115,18 +116,20 @@ function fillStorage() {
       }
       storageArr = arr;
     }
+    
+    nightTask();
 
-  });  
+  });
 }
 
 function addCell(arr, day, done) {
   arr[day][done] = false;
 }
 
-var now = new Date();
-var timeDiff = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 3, 0, 0, 0) - now;
-if (timeDiff < 0) {
-  timeDiff += 86400000; // 24 hours later
-}
-//setTimeout(nightTask, timeDiff);
-setTimeout(nightTask, 5000);
+// var now = new Date();
+// var timeDiff = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 3, 0, 0, 0) - now;
+// if (timeDiff < 0) {
+//   timeDiff += 86400000; // 24 hours later
+// }
+// //setTimeout(nightTask, timeDiff);
+// setTimeout(nightTask, 5000);
