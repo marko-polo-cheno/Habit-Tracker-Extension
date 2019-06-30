@@ -15,7 +15,6 @@ fillStorage();
 // Set date
 document.getElementById('dateLabel').innerHTML = getDate();
 
-
 chrome.storage.local.get('toDoList', function getData(data) {
   toDoList = (data.toDoList) ? data.toDoList : toDoList;
   for (let x = 0; x < 7; x++) {
@@ -70,7 +69,7 @@ function nightTask() {
   // empty add-grid
   var addGrid = document.getElementById("add-grid");
   while (addGrid.firstChild) {
-      addGrid.removeChild(addGrid.firstChild);
+    addGrid.removeChild(addGrid.firstChild);
   }
 
   // fill add-grid
@@ -117,7 +116,20 @@ function fillStorage() {
       storageArr = arr;
     }
     
-    nightTask();
+    // fill add-grid
+    for (let day = 5; day >= 0; day--) {
+      for (let done = 0; done < 7; done++) {
+        let marker = document.createElement("button");
+        marker.innerHTML = toDoList[done].habit;
+        if (storageArr[day][done]) {
+          marker.style.background = green;
+        } else {
+          marker.style.background = white;
+        }
+        var addGrid = document.getElementById("add-grid");
+        addGrid.appendChild(marker);
+      }
+    }
 
   });
 }
@@ -126,10 +138,10 @@ function addCell(arr, day, done) {
   arr[day][done] = false;
 }
 
-// var now = new Date();
-// var timeDiff = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 3, 0, 0, 0) - now;
-// if (timeDiff < 0) {
-//   timeDiff += 86400000; // 24 hours later
-// }
-// //setTimeout(nightTask, timeDiff);
-// setTimeout(nightTask, 5000);
+var now = new Date();
+var timeDiff = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 3, 0, 0, 0) - now;
+if (timeDiff < 0) {
+  timeDiff += 86400000; // 24 hours later
+}
+setTimeout(nightTask, timeDiff); // setInterval did weird stuff, just use setTimeout
+// setTimeout(nightTask, 5000); // for testing
