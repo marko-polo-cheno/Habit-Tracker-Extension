@@ -73,7 +73,7 @@ function nightTask() {
   }
 
   // fill add-grid
-  for (let day = 0; day < 6; day++) {
+  for (let day = 5; day >= 0; day--) {
     for (let done = 0; done < 7; done++) {
       let marker = document.createElement("button");
       marker.innerHTML = toDoList[done].habit;
@@ -126,7 +126,7 @@ function addCell(arr, day, done) {
 var now = new Date();
 var timeDiff = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 3, 0, 0, 0) - now;
 if (timeDiff < 0) {
-     timeDiff += 86400000; // 24 hours later
+  timeDiff += 86400000; // 24 hours later
 }
-// setTimeout(nightTask, timeDiff);
+//setTimeout(nightTask, timeDiff);
 setTimeout(nightTask, 5000);
