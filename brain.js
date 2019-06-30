@@ -9,13 +9,14 @@ let toDoList = [
 ];
 let green = 'rgb(50, 205, 50)';
 let white = "#eee";
-let storageArr = fillStorage(7, 7);
+let storageArr;
+fillStorage();
 
 // Set date
 document.getElementById('dateLabel').innerHTML = getDate();
 
 chrome.storage.local.get('toDoList', function getData(data) {
-  toDoList = data.toDoList;
+  toDoList = (data.toDoList) ? data.toDoList : toDoList;
   for (let x = 0; x < 7; x++) {
     let button = document.createElement("button");
     button.innerHTML = toDoList[x].habit;
@@ -59,33 +60,63 @@ function nightTask() {
   for (let day = 0; day < 6; day++) {
     storageArr[day] = storageArr[day+1];
   }
-  
+
   // Replace last day
   for (let done = 0; done < 7; done++) {
     storageArr[6][done] = toDoList[done].done;
   }
-  
+
+  // empty add-grid
+  var addGrid = document.getElementById("add-grid");
+  while (addGrid.firstChild) {
+      addGrid.removeChild(addGrid.firstChild);
+  }
+
+  // fill add-grid
+  for (let day = 0; day < 6; day++) {
+    for (let done = 0; done < 7; done++) {
+      let marker = document.createElement("button");
+      marker.innerHTML = toDoList[done].habit;
+      if (storageArr[day][done]) {
+        marker.style.background = green;
+      } else {
+        marker.style.background = white;
+      }
+      var addGrid = document.getElementById("add-grid");
+      addGrid.appendChild(marker);
+    }
+  }
+
   // Refresh
   for (let x = 0; x<7; x++) {
     toDoList[x].done = false;
     document.getElementById(x).style.background = white;
   }
-
+  
   // Stores
-  chrome.storage.local.set({'storageArr': storageArr});
-  chrome.storage.local.set({'toDoList': toDoList});
+  chrome.storage.local.set(
+    {'storageArr': storageArr, 'toDoList': toDoList}
+  );
 }
 
 // Creates an array for storage
 function fillStorage() {
-  const arr = [];
-  for (let day = 0; day < 7; day++) {
-    arr[day] = []; // set up inner array
-    for (let done = 0; done < 7; done++) {
-      addCell(arr,day,done);
+  chrome.storage.local.get('storageArr', function getData(data){
+
+    if (data.storageArr) {
+      storageArr = data.storageArr;
+    } else {
+      let arr = [];
+      for (let day = 0; day < 7; day++) {
+        arr[day] = []; // set up inner array
+        for (let done = 0; done < 7; done++) {
+          addCell(arr,day,done);
+        }
+      }
+      storageArr = arr;
     }
-  }
-  return arr;
+
+  });  
 }
 
 function addCell(arr, day, done) {
