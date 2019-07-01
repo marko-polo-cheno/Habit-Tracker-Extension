@@ -1,6 +1,6 @@
 {
   "name": "Habit Tracker",
-  "version": "1.7",
+  "version": "2.0",
   "description": "simple habit tracking in your browser",
   "permissions": [
     "storage",

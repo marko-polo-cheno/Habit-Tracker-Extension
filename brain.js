@@ -15,6 +15,9 @@ fillStorage();
 // Set date
 document.getElementById('dateLabel').innerHTML = getDate();
 
+// Set version
+version.innerHTML = `Version <a href="https://github.com/marko-polo-cheno/Habit-Tracker-Extension/releases" target="_blank" title="See release notes">${chrome.runtime.getManifest().version}</a>`;
+
 chrome.storage.local.get('toDoList', function getData(data) {
   toDoList = (data.toDoList) ? data.toDoList : toDoList;
   for (let x = 0; x < 7; x++) {
@@ -126,9 +129,12 @@ function fillStorage() {
         } else {
           marker.style.background = white;
         }
+        marker.style.opacity = (day*0.1 + 0.5) + "";
+
         var addGrid = document.getElementById("add-grid");
         addGrid.appendChild(marker);
       }
+      
     }
 
   });
