@@ -12,7 +12,24 @@ let white = "#eee";
 let storageArr;
 
 let lastDate;
+
+chrome.storage.local.get('lastDate', function getData(data) {
+  lastDate = (data.lastDate) ? data.lastDate : lastDate;
+});
+
 fillStorage();
+
+let nowDate = new Date();
+let nowDateNum = nowDate.getDate();
+if(nowDateNum>lastDate){
+  for(let passed=0; passed < nowDateNum-lastDate; passed++){
+  nightTask();
+  }
+} else if (nowDateNum<lastDate){
+  for(let passed=0; passed < 7; passed++){
+    nightTask();
+  }
+}
 
 // Set date
 document.getElementById('dateLabel').innerHTML = getDate();
@@ -143,10 +160,14 @@ function getDate() {
   let mm = String(today.getMonth() + 1).padStart(2, '0');
   let yyyy = today.getFullYear();
 
+
+  lastDate=dd;
+
   today = mm + '/' + dd + '/' + yyyy;
   return today;
 }
 
+/*
 var now = new Date();
 var timeDiff = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 3, 0, 0, 0) - now;
 if (timeDiff < 0) {
@@ -154,3 +175,4 @@ if (timeDiff < 0) {
 }
 setTimeout(nightTask, timeDiff); // setInterval did weird stuff, just use setTimeout
 // setTimeout(nightTask, 5000); // for testing
+*/
