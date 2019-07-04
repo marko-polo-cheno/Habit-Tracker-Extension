@@ -10,6 +10,8 @@ let toDoList = [
 let green = 'rgb(50, 205, 50)';
 let white = "#eee";
 let storageArr;
+
+let lastDate;
 fillStorage();
 
 // Set date
@@ -46,16 +48,7 @@ chrome.storage.local.get('toDoList', function getData(data) {
   }
 });
 
-// Gets the date from the computer
-function getDate() {
-  let today = new Date();
-  let dd = String(today.getDate()).padStart(2, '0');
-  let mm = String(today.getMonth() + 1).padStart(2, '0');
-  let yyyy = today.getFullYear();
 
-  today = mm + '/' + dd + '/' + yyyy;
-  return today;
-}
 
 // Runs after user sleeps
 function nightTask() {
@@ -98,7 +91,7 @@ function nightTask() {
   
   // Stores
   chrome.storage.local.set(
-    {'storageArr': storageArr, 'toDoList': toDoList}
+    {'storageArr': storageArr, 'toDoList': toDoList, 'lastDate' : lastDate}
   );
 }
 
@@ -119,7 +112,7 @@ function fillStorage() {
       storageArr = arr;
     }
     
-    // fill add-grid
+    // Creates a button grid displaying a weeks worth of tracking
     for (let day = 5; day >= 0; day--) {
       for (let done = 0; done < 7; done++) {
         let marker = document.createElement("button");
@@ -130,11 +123,10 @@ function fillStorage() {
           marker.style.background = white;
         }
         marker.style.opacity = (day*0.1 + 0.5) + "";
-
         var addGrid = document.getElementById("add-grid");
         addGrid.appendChild(marker);
       }
-      
+      addGrid.appendChild(document.createElement('div'));
     }
 
   });
@@ -142,6 +134,17 @@ function fillStorage() {
 
 function addCell(arr, day, done) {
   arr[day][done] = false;
+}
+
+// Gets the date from the computer
+function getDate() {
+  let today = new Date();
+  let dd = String(today.getDate()).padStart(2, '0');
+  let mm = String(today.getMonth() + 1).padStart(2, '0');
+  let yyyy = today.getFullYear();
+
+  today = mm + '/' + dd + '/' + yyyy;
+  return today;
 }
 
 var now = new Date();
