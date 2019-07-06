@@ -29,11 +29,18 @@ chrome.storage.local.get('lastDate', function getData(data) {
   }
 });
 
+
+
 fillStorage();
 
 
 // Set date
 document.getElementById('dateLabel').innerHTML = getDate();
+
+// Stores last date of when code ran ~ specifically after the getDate() runs
+chrome.storage.local.set(
+  {'lastDate' : lastDate}
+);
 
 // Set version
 version.innerHTML = `Version <a href="https://github.com/marko-polo-cheno/Habit-Tracker-Extension/releases" target="_blank" title="See release notes">${chrome.runtime.getManifest().version}</a>`;
@@ -109,7 +116,7 @@ function nightTask() {
   
   // Stores
   chrome.storage.local.set(
-    {'storageArr': storageArr, 'toDoList': toDoList, 'lastDate' : lastDate}
+    {'storageArr': storageArr, 'toDoList': toDoList}
   );
 }
 
