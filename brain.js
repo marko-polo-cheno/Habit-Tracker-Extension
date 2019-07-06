@@ -15,21 +15,22 @@ let lastDate;
 
 chrome.storage.local.get('lastDate', function getData(data) {
   lastDate = (data.lastDate) ? data.lastDate : lastDate;
+
+  let nowDate = new Date();
+  let nowDateNum = nowDate.getDate();
+  if(nowDateNum>lastDate){
+    for(let passed=0; passed < nowDateNum-lastDate; passed++){
+    nightTask();
+    }
+  } else if (nowDateNum<lastDate){
+    for(let passed=0; passed < 7; passed++){
+      nightTask();
+    }
+  }
 });
 
 fillStorage();
 
-let nowDate = new Date();
-let nowDateNum = nowDate.getDate();
-if(nowDateNum>lastDate){
-  for(let passed=0; passed < nowDateNum-lastDate; passed++){
-  nightTask();
-  }
-} else if (nowDateNum<lastDate){
-  for(let passed=0; passed < 7; passed++){
-    nightTask();
-  }
-}
 
 // Set date
 document.getElementById('dateLabel').innerHTML = getDate();
