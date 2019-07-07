@@ -16,17 +16,35 @@ let lastDate;
  * Any "sets" should called within this "get" (or called by functions within this "get"). 
  */
 chrome.storage.local.get(['toDoList','storageArr','lastDate'], function getData(data) {
+
   createToDoList(data);
   fillStorage(data);
+
   let nowDate = new Date().getDate();
-  lastDate = storageArr[6][0].date; // get last day (6) -> any habit (e.g. 0) -> its date
-  lastDate = lastDate ? lastDate : nowDate;
-  let isNewDay = (nowDate > lastDate);
-  if (isNewDay) {
-    nightTask();
+  lastDate = (data.lastDate) ? data.lastDate : storageArr[6][0].date;
+
+  //Creates a new line for every different day, and missed days eg. offline for 48 hours = 2 empty days OR lost computer for a week = 7 empty days
+  if (nowDate > lastDate) {
+    for(let daysPassed = 0; daysPassed < nowDate - lastDate; daysPassed++){
+      nightTask();
+    }
+  } else if (lastDate > nowDate){ // when dec 31 turns to jan 1
+    let nowMonth = new Date().getMonth();
+    //Days from last month (later on, +1 -1 can cancel)
+    let totalTimePassed = daysInMonth(nowMonth-1) - lastDate + nowDate;
+    
+    for(let daysPassed = 0; daysPassed < totalTimePassed; daysPassed++){
+      nightTask();
+    }
+
   }
 
-  // Stores last date of when code ran ~ specifically after the getDate() runs
+
+  //Update complete ~ all past data is up to date
+  lastDate = nowDate;
+  //fillStorage(data.storageArr);
+
+  // Stores last date of when code ran
   chrome.storage.local.set(
     {'lastDate' : lastDate}
   );
@@ -66,7 +84,7 @@ function createToDoList(data) {
   }
 }
 
-// Runs after user sleeps
+// Runs after user sleeps aka upon opening on a new day
 function nightTask() {
   // Shift down
   for (let day = 0; day < 6; day++) {
@@ -117,14 +135,7 @@ function fillStorage(data) {
     if (data.storageArr) {
       storageArr = data.storageArr;
     } else {
-      let arr = [];
-      for (let day = 0; day < 7; day++) {
-        arr[day] = []; // set up inner array
-        for (let habit = 0; habit < 7; habit++) {
-          addCell(arr,day,habit);
-        }
-      }
-      storageArr = arr;
+      storageArr = empty7by7();
     }
     
     // Creates a button grid displaying a weeks worth of tracking
@@ -145,13 +156,6 @@ function fillStorage(data) {
     }
 }
 
-function addCell(arr, day, habit) {
-  arr[day][habit] = {
-    'done': false, // get this with: storageArr[day][habit].done
-    'date': new Date().getDate() // get this with: storageArr[day][habit].date
-  };
-}
-
 // Gets the date from the computer
 function getDate() {
   let today = new Date();
@@ -159,8 +163,40 @@ function getDate() {
   let mm = String(today.getMonth() + 1).padStart(2, '0');
   let yyyy = today.getFullYear();
 
-  lastDate=dd;
-
   today = mm + '/' + dd + '/' + yyyy;
   return today;
+}
+
+function empty7by7(){
+  let arr = [];
+  let date = new Date().getDate();
+  for (let day = 0; day < 7; day++) {
+    arr[day] = []; // set up inner array
+    for (let habit = 0; habit < 7; habit++) {
+      addCell(arr,day,habit,date);
+    }
+  }
+  return arr;
+}
+
+function addCell(arr, day, habit, date) {
+  arr[day][habit] = {
+    'done': false, // get this with: storageArr[day][habit].done
+    'date': date // get this with: storageArr[day][habit].date
+  };
+}
+
+
+function daysInMonth(num){
+  //Changes computer nums into actual month nums
+  num++;
+
+  //Returns num of days in a month
+  if (num==2){
+    return 28;
+  } else if (num<=7){
+    return (num%2) ? 30 : 31;
+  } else {
+    return (num%2) ? 31 : 30;
+  }
 }

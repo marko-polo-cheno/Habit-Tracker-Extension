@@ -1,6 +1,6 @@
 {
   "name": "Habit Tracker",
-  "version": "3",
+  "version": "3.1",
   "description": "This is a simple christian habit tracker for your chrome browser.",
   "permissions": [
     "storage",
