@@ -10,42 +10,35 @@ let toDoList = [
 let green = 'rgb(50, 205, 50)';
 let white = "#eee";
 let storageArr;
-
 let lastDate;
 
-chrome.storage.local.get('lastDate', function getData(data) {
-  lastDate = (data.lastDate) ? data.lastDate : lastDate;
-
-  let nowDate = new Date();
-  let nowDateNum = nowDate.getDate();
-  if(nowDateNum>lastDate){
-    for(let passed=0; passed < nowDateNum-lastDate; passed++){
+/* To avoid timing problems, this code should only once use "get": chrome.storage.local.get 
+ * Any "sets" should called within this "get" (or called by functions within this "get"). 
+ */
+chrome.storage.local.get(['toDoList','storageArr','lastDate'], function getData(data) {
+  createToDoList(data);
+  fillStorage(data);
+  let nowDate = new Date().getDate();
+  lastDate = storageArr[6][0].date; // get last day (6) -> any habit (e.g. 0) -> its date
+  lastDate = lastDate ? lastDate : nowDate;
+  let isNewDay = (nowDate > lastDate);
+  if (isNewDay) {
     nightTask();
-    }
-  } else if (nowDateNum<lastDate){
-    for(let passed=0; passed < 7; passed++){
-      nightTask();
-    }
   }
+
+  // Stores last date of when code ran ~ specifically after the getDate() runs
+  chrome.storage.local.set(
+    {'lastDate' : lastDate}
+  );
 });
-
-
-
-fillStorage();
-
 
 // Set date
 document.getElementById('dateLabel').innerHTML = getDate();
 
-// Stores last date of when code ran ~ specifically after the getDate() runs
-chrome.storage.local.set(
-  {'lastDate' : lastDate}
-);
-
 // Set version
 version.innerHTML = `Version <a href="https://github.com/marko-polo-cheno/Habit-Tracker-Extension/releases" target="_blank" title="See release notes">${chrome.runtime.getManifest().version}</a>`;
 
-chrome.storage.local.get('toDoList', function getData(data) {
+function createToDoList(data) {
   toDoList = (data.toDoList) ? data.toDoList : toDoList;
   for (let x = 0; x < 7; x++) {
     let button = document.createElement("button");
@@ -71,9 +64,7 @@ chrome.storage.local.get('toDoList', function getData(data) {
     var addButtonsHere = document.getElementById("add-buttons-here");
     addButtonsHere.appendChild(button);
   }
-});
-
-
+}
 
 // Runs after user sleeps
 function nightTask() {
@@ -83,8 +74,8 @@ function nightTask() {
   }
 
   // Replace last day
-  for (let done = 0; done < 7; done++) {
-    storageArr[6][done] = toDoList[done].done;
+  for (let habit = 0; habit < 7; habit++) {
+    storageArr[6][habit].done = toDoList[habit].done;
   }
 
   // empty add-grid
@@ -95,10 +86,10 @@ function nightTask() {
 
   // fill add-grid
   for (let day = 5; day >= 0; day--) {
-    for (let done = 0; done < 7; done++) {
+    for (let habit = 0; habit < 7; habit++) {
       let marker = document.createElement("button");
-      marker.innerHTML = toDoList[done].habit;
-      if (storageArr[day][done]) {
+      marker.innerHTML = toDoList[habit].habit;
+      if (storageArr[day][habit].done) {
         marker.style.background = green;
       } else {
         marker.style.background = white;
@@ -106,10 +97,11 @@ function nightTask() {
       var addGrid = document.getElementById("add-grid");
       addGrid.appendChild(marker);
     }
+    addGrid.appendChild(document.createElement('div'));
   }
 
   // Refresh
-  for (let x = 0; x<7; x++) {
+  for (let x = 0; x < 7; x++) {
     toDoList[x].done = false;
     document.getElementById(x).style.background = white;
   }
@@ -121,17 +113,15 @@ function nightTask() {
 }
 
 // Creates an array for storage
-function fillStorage() {
-  chrome.storage.local.get('storageArr', function getData(data){
-
+function fillStorage(data) {
     if (data.storageArr) {
       storageArr = data.storageArr;
     } else {
       let arr = [];
       for (let day = 0; day < 7; day++) {
         arr[day] = []; // set up inner array
-        for (let done = 0; done < 7; done++) {
-          addCell(arr,day,done);
+        for (let habit = 0; habit < 7; habit++) {
+          addCell(arr,day,habit);
         }
       }
       storageArr = arr;
@@ -139,10 +129,10 @@ function fillStorage() {
     
     // Creates a button grid displaying a weeks worth of tracking
     for (let day = 5; day >= 0; day--) {
-      for (let done = 0; done < 7; done++) {
+      for (let habit = 0; habit < 7; habit++) {
         let marker = document.createElement("button");
-        marker.innerHTML = toDoList[done].habit;
-        if (storageArr[day][done]) {
+        marker.innerHTML = toDoList[habit].habit;
+        if (storageArr[day][habit].done) {
           marker.style.background = green;
         } else {
           marker.style.background = white;
@@ -153,12 +143,13 @@ function fillStorage() {
       }
       addGrid.appendChild(document.createElement('div'));
     }
-
-  });
 }
 
-function addCell(arr, day, done) {
-  arr[day][done] = false;
+function addCell(arr, day, habit) {
+  arr[day][habit] = {
+    'done': false, // get this with: storageArr[day][habit].done
+    'date': new Date().getDate() // get this with: storageArr[day][habit].date
+  };
 }
 
 // Gets the date from the computer
@@ -168,19 +159,8 @@ function getDate() {
   let mm = String(today.getMonth() + 1).padStart(2, '0');
   let yyyy = today.getFullYear();
 
-
   lastDate=dd;
 
   today = mm + '/' + dd + '/' + yyyy;
   return today;
 }
-
-/*
-var now = new Date();
-var timeDiff = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 3, 0, 0, 0) - now;
-if (timeDiff < 0) {
-  timeDiff += 86400000; // 24 hours later
-}
-setTimeout(nightTask, timeDiff); // setInterval did weird stuff, just use setTimeout
-// setTimeout(nightTask, 5000); // for testing
-*/
